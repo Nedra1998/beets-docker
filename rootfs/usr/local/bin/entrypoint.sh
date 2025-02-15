@@ -11,9 +11,17 @@ fi
 
 beets_config="/config/config.yaml"
 
-inotifywait -m -e created,moved_to --format '%w%f' "$WATCH_DIR" | while IFS= read -r dir_path; do
+inotifywait -m -e close_write,moved_to --format '%w%f' "$WATCH_DIR" | while IFS= read -r dir_path; do
   # Wait for file to be completely written...
-  sleep 15
+  if [ -f "$dir_path" ]; then
+    last_size=$(stat -c%s "$dir_path")
+    while [ "$last_size" -ne "$(stat -c%s "$dir_path")" ]; do
+      last_size=$(stat -c%s "$newfile")
+      sleep 1
+    done
+  elif [ -d "$dir_path" ]; then
+    sleep 30
+  fi
 
   # Unzip zip files into new subdirectories
   if [ -f "$dir_path" ]; then
