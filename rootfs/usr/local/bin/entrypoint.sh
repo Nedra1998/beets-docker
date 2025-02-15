@@ -11,16 +11,25 @@ fi
 
 beets_config="/config/config.yaml"
 
-inotifywait -m -e close_write,moved_to --format '%w%f' "$WATCH_DIR" | while IFS= read -r dir_path; do
+inotifywait -m -e create,moved_to --format '%w%f' "$WATCH_DIR" | while IFS= read -r dir_path; do
+  sleep 1
   # Wait for file to be completely written...
   if [ -f "$dir_path" ]; then
+    # Wait for file to be completely written by checking for size changes
     last_size=$(stat -c%s "$dir_path")
+    sleep 1
     while [ "$last_size" -ne "$(stat -c%s "$dir_path")" ]; do
       last_size=$(stat -c%s "$newfile")
       sleep 1
     done
   elif [ -d "$dir_path" ]; then
-    sleep 30
+    # Wait for directory to be completely written by checking for new files
+    last_count=$(find "$dir_path" -type f | wc -l)
+    sleep 1
+    while [ "$last_count" -ne "$(find "$dir_path" -type f | wc -l)" ]; do
+      last_count=$(find "$dir_path" -type f | wc -l)
+      sleep 1
+    done
   fi
 
   # Unzip zip files into new subdirectories
@@ -32,6 +41,8 @@ inotifywait -m -e close_write,moved_to --format '%w%f' "$WATCH_DIR" | while IFS=
       continue
     fi
   fi
+
+  sleep 1
 
   # Import music files
   /usr/bin/beet -c "$beets_config" import --incremental --flat "$dir_path"
