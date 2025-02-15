@@ -1,0 +1,64 @@
+plugins: fetchart embedart spotify chroma inline fromfilename info edit lastgenre
+library: /db/database.db
+directory: /library
+statefile: /db/state.pickle
+threaded: yes
+asciify_paths: true
+
+import:
+  write: yes
+  copy: no
+  move: yes
+  link: no
+  hardlink: no
+  reflink: no
+  delete: no
+  resume: ask
+  incremental: no
+  incremental_skip_later: no
+  from_scratch: no
+  quiet_fallback: skip
+  none_rec_action: ask
+  timid: no
+  log:
+  autotag: yes
+  quiet: no
+  singletons: no
+  default_action: apply
+  languages: []
+  detail: no
+  flat: no
+  group_albums: no
+  pretend: false
+  search_ids: []
+  duplicate_action: ask
+  bell: no
+  set_fields: {}
+
+ui:
+  terminal_width: 120
+  length_diff_thresh: 10.0
+  color: yes
+
+clutter: ["Thumbs.DB", ".DS_Store"]
+ignore: [".*", "*~", "System Volume Information", "lost+found"]
+ignore_hidden: yes
+
+item_fields:
+  padded_track: "'{:02n}'.format(track)"
+
+paths:
+  default: $albumartist/$album ($year)/$padded_track $title
+
+spotify:
+  source_weight: 0.0
+
+lastgenre:
+  auto: yes
+  source: album
+
+embedart:
+  auto: yes
+
+fetchart:
+  auto: yes
