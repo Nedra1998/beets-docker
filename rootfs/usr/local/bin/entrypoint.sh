@@ -19,7 +19,7 @@ inotifywait -m -e create,moved_to --format '%w%f' "$WATCH_DIR" | while IFS= read
     last_size=$(stat -c%s "$dir_path")
     sleep 1
     while [ "$last_size" -ne "$(stat -c%s "$dir_path")" ]; do
-      last_size=$(stat -c%s "$newfile")
+      last_size=$(stat -c%s "$dir_path")
       sleep 1
     done
   elif [ -d "$dir_path" ]; then
