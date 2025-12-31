@@ -175,10 +175,10 @@ docker run --rm -v ./config:/config -v ./library:/library \
 
 ### 2. Trigger File Monitoring Mode
 
-Enabled when `TRIGGER_FILE` is set. The container monitors the specified file and runs an **in-place import** (no file copying) from `LIBRARY_DIR` when the file is modified. This is useful when:
+Enabled when `TRIGGER_FILE` is set. The container monitors the specified file and runs an **in-place import** (using `--nocopy` flag, which means files are scanned and cataloged but not moved from their current location) from `LIBRARY_DIR` when the file is modified. This is useful when:
 - You want to manually trigger imports
-- An external process manages your files
-- You want to import without moving files
+- An external process manages your files and you don't want Beets to move them
+- You want to catalog music without reorganizing your file structure
 
 ### 3. Import Directory Monitoring Mode
 
