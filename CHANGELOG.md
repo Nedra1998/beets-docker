@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.1.0] - 2025-12-31
 
 ### 🚀 Features
 
@@ -21,8 +21,11 @@ All notable changes to this project will be documented in this file.
 ### 📚 Documentation
 
 - Create readme and update docker workflow
+- Setup git-cliff to generate changelog
 
 ### ⚙️ Miscellaneous Tasks
 
 - Create docker-publish.yml
 - Update docker-publish.yml
+- Update github action permissions
+- Remove git attest to fix CI failure
