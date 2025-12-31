@@ -110,8 +110,6 @@ docker run -d \
 Here's a complete `docker-compose.yml` example:
 
 ```yaml
-version: '3.8'
-
 services:
   beets:
     image: ghcr.io/nedra1998/beets:latest
@@ -151,8 +149,6 @@ services:
 For a simple setup with just automatic import monitoring:
 
 ```yaml
-version: '3.8'
-
 services:
   beets:
     image: ghcr.io/nedra1998/beets:latest
