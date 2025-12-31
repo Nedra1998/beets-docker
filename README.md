@@ -117,16 +117,16 @@ services:
     restart: unless-stopped
     environment:
       # Optional: Set custom paths
-      - BEETSDIR=/config
-      - CONFIG_FILE=/config/config.yaml
+      BEETSDIR: /config
+      CONFIG_FILE: /config/config.yaml
       
       # Enable automatic import from downloads directory
-      - IMPORT_DIR=/import
-      - DEBOUNCE_SECONDS=30
+      IMPORT_DIR: /import
+      DEBOUNCE_SECONDS: 30
       
       # Optional: Enable trigger-based import
-      # - TRIGGER_FILE=/trigger/import.trigger
-      # - LIBRARY_DIR=/library
+      # TRIGGER_FILE: /trigger/import.trigger
+      # LIBRARY_DIR: /library
     volumes:
       # Beets configuration and database
       - ./config:/config
@@ -155,7 +155,7 @@ services:
     container_name: beets
     restart: unless-stopped
     environment:
-      - IMPORT_DIR=/import
+      IMPORT_DIR: /import
     volumes:
       - ./beets-config:/config
       - /path/to/music:/library
