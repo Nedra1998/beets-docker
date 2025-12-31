@@ -4,8 +4,9 @@ on:
   schedule:
     - cron: "0 0 * * 1"
   push:
-    branches: ["main"]
-    tags: ["v*.*.*"]
+    branches:
+      - main
+  workflow_dispatch: {}
 
 env:
   REGISTRY: ghcr.io
@@ -17,8 +18,6 @@ jobs:
     permissions:
       packages: write
       contents: read
-      attestations: write
-      id-token: write
 
     steps:
       - name: Checkout repository
@@ -50,9 +49,6 @@ jobs:
           tags: |
             # set latest tag for default branch
             type=raw,value=latest,enable={{is_default_branch}}
-            type=semver,pattern=v{{major}}.{{minor}},enable={{is_default_branch}}
-            type=semver,pattern=v{{major}},enable={{is_default_branch}}
-            type=semver,pattern=v{{major}}.{{minor}}.{{patch}},enable={{is_default_branch}}
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
