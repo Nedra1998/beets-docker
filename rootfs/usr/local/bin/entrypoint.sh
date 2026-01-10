@@ -101,8 +101,8 @@ monitor_import_directory() {
       true
     done
 
-    # Extract any zip files in the import directory before importing
     shopt -s nullglob
+    # Extract any zip files in the import directory before importing
     for zipfile in "$IMPORT_DIR"/*.zip; do
       log DBG "Found zip file '$zipfile', extracting..."
       dest_dir="${zipfile%.zip}"
@@ -114,6 +114,18 @@ monitor_import_directory() {
         log WRN "Failed to extract zip file '$zipfile', skipping removal."
       fi
     done
+
+    # Move single files in the import directory root into their own subdirectories
+    for filepath in "$IMPORT_DIR"/*; do
+      if [ -f "$filepath" ]; then
+        filename="$(basename "$filepath")"
+        name="${filename%.*}"
+        filedir="$IMPORT_DIR/$name"
+
+        log DBG "Found single file '$filename' in import directory root, moving to subdirectory '$filedir'."
+        mkdir -p "$filedir" && mv "$filepath" "$filedir/"
+      fi
+    done
     shopt -u nullglob
 
     # Clear any inotify events that may have occurred due to unzipping
@@ -123,10 +135,7 @@ monitor_import_directory() {
 
     acquire_lock
     log INF "Starting import for '$IMPORT_DIR'..."
-    # Import album foluders
     beet -c "${CONFIG_FILE}" import --quiet --move "$IMPORT_DIR"
-    # Import any single files that were not part of an album
-    beet -c "${CONFIG_FILE}" import --quiet --move --singletons "$IMPORT_DIR"
     release_lock
     log INF "Import completed for '$IMPORT_DIR'. Returning to watch mode."
   done
