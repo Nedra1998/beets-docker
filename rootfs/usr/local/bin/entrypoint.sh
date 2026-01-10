@@ -123,7 +123,10 @@ monitor_import_directory() {
 
     acquire_lock
     log INF "Starting import for '$IMPORT_DIR'..."
-    beet -c "${CONFIG_FILE}" import --quiet "$IMPORT_DIR"
+    # Import album foluders
+    beet -c "${CONFIG_FILE}" import --quiet --move "$IMPORT_DIR"
+    # Import any single files that were not part of an album
+    beet -c "${CONFIG_FILE}" import --quiet --move --singletons "$IMPORT_DIR"
     release_lock
     log INF "Import completed for '$IMPORT_DIR'. Returning to watch mode."
   done
