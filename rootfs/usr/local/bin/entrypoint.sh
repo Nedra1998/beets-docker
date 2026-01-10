@@ -26,7 +26,6 @@
 # is useful for automatically importing new music files into your beets library
 # as they are added, either manually or automatically to the import directory.
 
-
 TRIGGER_FILE="${TRIGGER_FILE:-}"
 LIBRARY_DIR="${LIBRARY_DIR:-/library}"
 IMPORT_DIR="${IMPORT_DIR:-}"
@@ -55,15 +54,14 @@ log() {
 # acquired, always remember to release the lock after acquiring it, even
 # in error conditions.
 acquire_lock() {
-    while ! mkdir "$LOCK_DIR" 2>/dev/null; do
-        sleep 1
-    done
+  while ! mkdir "$LOCK_DIR" 2>/dev/null; do
+    sleep 1
+  done
 }
-
 
 # @description Release the POSIX atomic lock.
 release_lock() {
-    rmdir "$LOCK_DIR" 2>/dev/null
+  rmdir "$LOCK_DIR" 2>/dev/null
 }
 
 # @description Monitor the trigger file for modifications and run beets import
@@ -90,7 +88,7 @@ monitor_import_directory() {
 
   # TODO: Currently depends on bash process substitution, would be better to avoid
   # the dependency for better portability, and only use POSIX features.
-  exec 3< <(inotifywait -m -r -e create,modify,move,moved_to,close_write --format '%w%f' "$IMPORT_DIR")
+  exec 3< <(inotifywait -m -r -e create,moved_to --format '%w%f' "$IMPORT_DIR")
 
   while read -r EVENT <&3; do
     log DBG "Event detected '$EVENT', waiting for debounce period of ${DEBOUNCE_SECONDS}s."
@@ -99,11 +97,32 @@ monitor_import_directory() {
     # TODO: Currently this depends on bash-specific features, would be better to avoid
     # and only use POSIX features for better portability.
     while read -r -t "$DEBOUNCE_SECONDS" EVENT <&3; do
-      log DBG "Additional event detected '$EVENT', resetting debounce timer."
+      log DBG "Additional event detected '$(basename "$EVENT")', resetting debounce timer."
+      true
+    done
+
+    # Extract any zip files in the import directory before importing
+    shopt -s nullglob
+    for zipfile in "$IMPORT_DIR"/*.zip; do
+      log DBG "Found zip file '$zipfile', extracting..."
+      dest_dir="${zipfile%.zip}"
+
+      if mkdir -p "$dest_dir" && unzip -q -o "$zipfile" -d "$dest_dir"; then
+        log DBG "Successfully extracted zip file '$zipfile' to '$dest_dir', removing zip file."
+        rm -f "$zipfile"
+      else
+        log WRN "Failed to extract zip file '$zipfile', skipping removal."
+      fi
+    done
+    shopt -u nullglob
+
+    # Clear any inotify events that may have occurred due to unzipping
+    while read -r -t 0.1 EVENT <&3; do
       true
     done
 
     acquire_lock
+    log INF "Starting import for '$IMPORT_DIR'..."
     beet -c "${CONFIG_FILE}" import --quiet "$IMPORT_DIR"
     release_lock
     log INF "Import completed for '$IMPORT_DIR'. Returning to watch mode."

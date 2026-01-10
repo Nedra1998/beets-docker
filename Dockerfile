@@ -21,10 +21,11 @@ RUN apk update && apk upgrade && \
     apk add --no-cache --virtual=mp3gain --upgrade --repository="https://dl-cdn.alpinelinux.org/alpine/edge/testing/" \
       mp3val && \
     pip3 install --no-cache-dir --upgrade --break-system-packages \
-      'beets[chroma,embedart,fetchart,lastgenre,lyrics,replaygain] @ git+https://github.com/beetbox/beets.git' \
+      'beets[chroma,discogs,embedart,fetchart,lastgenre,lyrics,missing,replaygain] @ git+https://github.com/beetbox/beets.git' \
       beetcamp beets-copyartifacts3 && \
     apk del --purge build-dependencies && \
-    rm -rf /tmp/* /pkgs $HOME/.cache $HOME/.cargo
+    rm -rf /tmp/* /pkgs "$HOME/.cache" "$HOME/.cargo"
+
 
 COPY rootfs /
 ENV BEETSDIR=/config
